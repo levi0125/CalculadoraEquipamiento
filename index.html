@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora De Equipamiento</title>
+    <link rel="stylesheet" href="recursos/css/index.css">
+</head>
+<body>
+    <header>
+        <center><h1>Calculadrora de Materiales</h1></center>
+    </header>
+    <main class="container">
+        <!-- <section class="tit">
+            <h3>Material:</h3>
+            <div>Gris</div>
+            <div>Avnanzados</div>
+            <div>Elite</div>
+            <div>Epico</div>
+            <div>Legendario</div>
+        </section> -->
+
+        
+    </main>
+    <section class="GrupoDeMateriales"><h3 class="name">'+MaterialName+':</h3><input type="number" class="gray"><input type="number" class="green"><input type="number" class="blue"><input type="number" class="purple"><input type="number" class="yellow"></section>
+
+
+
+    <!-- <div class="test">
+        <div class="item">ITEM</div>
+        <div class="item">ITEM</div>
+        <div class="item">ITEM</div>
+        <div class="item">ITEM</div>
+        <div class="item">ITEM</div>
+        <div class="item">ITEM</div>
+    </div> -->
+
+    <script>
+        function createGroup(MaterialName){
+            
+            return '<section class="GrupoDeMateriales"><h3 class="name">'+MaterialName+':</h3><input type="number" class="gray"><input type="number" class="green"><input type="number" class="blue"><input type="number" class="purple"><input type="number" class="yellow"></section>'
+        }
+        let materiales='cuero,piedra,ebano,hueso,universales'.split(',')
+        let contenedor=document.getElementsByClassName('container')[0]
+
+        materiales.map(e=>{
+            contenedor.innerHTML+=createGroup(e)
+        })
+    </script>
+</body>
+</html>

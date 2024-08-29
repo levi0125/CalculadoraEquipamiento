@@ -1,0 +1,44 @@
+body{
+    width: 100vw;
+}
+.tit{
+    border:3px solid black;
+    background-color: rgb(55, 96, 55);
+}
+.container{
+    margin: 0px 10%;
+    /* width:100%; */
+    background-color: gray;
+    display: grid;
+    /* grid-template-columns: auto; */
+    grid-template-columns: repeat(auto-fill,minmax(100px,1fr));
+}
+.GrupoDeMateriales{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: 10px;
+    input{
+        max-width: 20%;
+        margin-bottom: 5px;
+    }
+}
+
+
+.test{
+    border:3px solid black;
+    width:100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    .item{
+        border:3px solid black;
+
+    }
+}
+.green{
+    background-color: green;
+}
+.gray{
+    background-color: gray;
+}
