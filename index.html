@@ -10,42 +10,34 @@
     <header>
         <center><h1>Calculadrora de Materiales</h1></center>
     </header>
-    <main class="container">
-        <!-- <section class="tit">
-            <h3>Material:</h3>
-            <div>Gris</div>
-            <div>Avnanzados</div>
-            <div>Elite</div>
-            <div>Epico</div>
-            <div>Legendario</div>
-        </section> -->
-
-        
+    <main class>
+        <div class="Main-Container">
+            <div class="container"></div>
+            <center>
+                <button class="calcular" id="calcular">Calcular Materiales</button>
+            </center>
+        </div>
     </main>
-    <section class="GrupoDeMateriales"><h3 class="name">'+MaterialName+':</h3><input type="number" class="gray"><input type="number" class="green"><input type="number" class="blue"><input type="number" class="purple"><input type="number" class="yellow"></section>
+    
+    <span class="absolute">
+        <div class="profile circle" id="Selector">
+            <div class="user-Name">
+                Seleccione <br>un perfil
+            </div>
+            <!-- <sup class="help">?
+                <div class="details">DETALLES</div>
+            </sup> -->
+        </div>
+        
+        <page class="Profiles" id="Profiles">
+            <li id="Close-Profile">- Cerrar Sesion</li>
+            <li id="Add-Profile">+ Crear Perfil</li>
+        </page>
+    </span>
+    <div class="relative">
+    </div>
+    <!-- <section class="Row-Flex"><h3 class="name">'+MaterialName+':</h3><input type="number" class="gray"><input type="number" class="green"><input type="number" class="blue"><input type="number" class="purple"><input type="number" class="yellow"></section> -->
 
-
-
-    <!-- <div class="test">
-        <div class="item">ITEM</div>
-        <div class="item">ITEM</div>
-        <div class="item">ITEM</div>
-        <div class="item">ITEM</div>
-        <div class="item">ITEM</div>
-        <div class="item">ITEM</div>
-    </div> -->
-
-    <script>
-        function createGroup(MaterialName){
-            
-            return '<section class="GrupoDeMateriales"><h3 class="name">'+MaterialName+':</h3><input type="number" class="gray"><input type="number" class="green"><input type="number" class="blue"><input type="number" class="purple"><input type="number" class="yellow"></section>'
-        }
-        let materiales='cuero,piedra,ebano,hueso,universales'.split(',')
-        let contenedor=document.getElementsByClassName('container')[0]
-
-        materiales.map(e=>{
-            contenedor.innerHTML+=createGroup(e)
-        })
-    </script>
+    <script src="recursos/js/index.js"></script>
 </body>
 </html>
