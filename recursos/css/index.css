@@ -1,6 +1,11 @@
 body{
     width: 100vw;
 }
+:root{
+    --widthResponsive: max(10vw, 20vh);
+    --heightResponsive: max(7vw, 15vh);
+
+}
 .tit{
     border:3px solid black;
     background-color: rgb(55, 96, 55);
@@ -33,31 +38,36 @@ main{
 }
 .calcular{
     background-color: rgb(58, 224, 58);
-    width: 20%;
+    width: var(--widthResponsive);
     padding: 1%;
     margin:2% auto;
 }
 .result{
     border-top:2px solid black;
-    input{
+    input::placeholder{
         color:white;
     }
 }
 
 .normal{
     background-color: gray;
+    background: radial-gradient(#b8b9bd, #9a9a9a, #495049);
 }
 .advanced{
     background-color: green;
+    background: radial-gradient(#01e03b, #03970e, #056404);
 }
 .elite{
     background-color: rgb(46, 205, 245);
+    background: radial-gradient(#0c9dc3, #008ab6, #025d84);
 }
 .epic{
     background-color: rgb(83, 7, 83);
+    background: radial-gradient(#dc79f1, #af42cf, #520c53);
 }
 .legendary{
     background-color: rgb(224, 161, 0);
+    background: radial-gradient(#f8a300, #ec7b03, #d15b00);
 }
 .relative{
     position: relative;
@@ -125,3 +135,64 @@ main{
         height: max(7vw, 15vh);
     }
 }
+
+
+
+.equipment{
+    --slotSize:max(6vw, 10vh);
+    width:calc(var(--slotSize) * 3.3);
+    .row-equipment{
+        display: flex;
+        justify-content: center;
+        /* flex-direction: column; */
+    }
+    .slot{
+        width:calc(var(--slotSize) * .7);
+        height: calc(var(--slotSize) * .7);
+        border:3px solid black;
+        margin:calc(var(--slotSize) * .15);
+        rotate: 45deg;
+        position: relative;
+
+
+
+        background: radial-gradient(yellow 1%, #ff7600 80%);
+
+        background: radial-gradient(#f8a300, #ec7b03, #d15b00);
+
+        box-shadow: 5px 5px black;
+
+    }
+    .slot::after{
+        content:"";
+        display: block;
+        background-image: url(../imgs/signo_mas.webp);
+        background-position: center;
+        background-size: 50%;
+        background-repeat: no-repeat;
+        position:absolute;
+        left: 0;
+        top:0;
+        right: 0;
+        bottom: 0;
+        rotate: -45deg;
+    }
+    .mid-row{
+        height: 0;
+        /* transform: translateY(calc( var(--slotSize) * -.507)); */
+        transform: translateY(calc( var(--slotSize) * -.53));
+
+    }
+}
+
+.equiment-Selector{
+
+    position: fixed;
+    display: none;
+    bottom: 0;
+    top:40%;
+    left:0;
+    right: 0;
+    background-color: red;
+}
+
