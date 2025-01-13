@@ -1,9 +1,10 @@
+// console.log("DATATABSE:JS");
 let  request,db;
 async function openDB(){
-    request= indexedDB.open("Profile_Data",1)
+    console.log("OPEN DB");
     db;
-
     return new Promise((resolve,reject)=>{
+        request= indexedDB.open("Profile_Data",3)
         request.onsuccess=(event)=>{
             db=event.target.result;
             console.log("Base de datos abierta")
@@ -12,19 +13,34 @@ async function openDB(){
         request.onupgradeneeded= (event)=>{
             db=event.target.result;
             console.log("ACTUUALIZANDO")
-            db.createObjectStore("profiles",{keyPath:"name"})
-            db.createObjectStore("backpack",{keyPath:"id"})
+            if (!db.objectStoreNames.contains("profiles")) {
+                db.createObjectStore("profiles",{keyPath:"name"})
+            }
+            // profiles = { name, date}
+            if (db.objectStoreNames.contains("backpack")) {
+                db.deleteObjectStore("backpack");
+            }
+
+            let backpackStore=db.createObjectStore("backpack",{keyPath:"date_time"})
+            // backpack= {
+            //      profile:"name", date_time:"yyyy-mm-dd hh:mm", 
+            //      ebony:[], leather:[], iron_stone:[], bones:[], universal:[]
+            // }
+            backpackStore.createIndex("ByUser","profile",{unique:false})
+            // backpackStore.createIndex("ByDate","date",{unique:false})
             resolve(db,request)
         };
         request.onerror=(event)=>{
             console.error("Error al abrir la base de datos")
             reject(event.target.error)
         }
-        
+        // console.log("PROMESA SETEADA")
     })
 }
 
 await openDB();
+// console.log("DEBES EXXPORTAR")
+
 
 // async function usarBaseDeDatos() {
 //     try {
@@ -50,24 +66,38 @@ function startTransaction(object,action="readwrite"){
 }
 
 //agregar datos
-function addData(data={},object="profiles"){
-    const [transaction,store]=startTransaction(object) 
+async function addData(data={},object="profiles"){
+    const [transaction,store]=startTransaction(object)
+    // console.log(store)
     store.add(data);
     // store.add({id:1,name:"Prueba",edad:25});
-    transaction.oncomplete=()=>console.log("Datos agregados");
-    transaction.onerror=(event)=>console.log("Error ",event);
+    return new Promise((resolve,reject)=>{
+        transaction.oncomplete=()=>{
+            console.log("Datos agregados")
+            resolve(true)
+        };
+        transaction.onerror=(event)=>{
+            console.log("Error ",event)
+            reject(event.target.error)
+        };
+    })
 }
     
 //leer datos
-async function readData({key,mode="key",object="profiles"}){
+async function readData({key,index,mode="key",object="profiles"}){
     return new Promise((resolve,reject)=>{
-
-        const [transaction,store]=startTransaction(object,"readonly")
+        let [transaction,store]=startTransaction(object,"readonly")
         
         // console.log("store=",store)
-        const data_request=(mode!="all")?store.get(key): store.getAll();
+        if(index!=null){
+            // console.log(object," USA EL INDEX ",index)
+            store=store.index(index)
+        }
+        const data_request=(mode!="all")?store.get(key): store.getAll(key);
         data_request.onsuccess=(event)=> {
             // console.log("Data:", result)
+            // console.log("OBJECT:=>",object,"\n=>",data_request.result)
+            // console.log()
             resolve(event.target.result)
         };
         data_request.onerror= (event)=>{
@@ -91,6 +121,13 @@ function deleteData({key,object="profiles"}){
     transaction.oncomplete=()=>console.log("Datos eliminados");
 }
 
+// console.log("BACKPACKS=>",await readData({mode:"all",object:"backpack"}))
+
+
+// readData({key:"2025-13-1 03:25:22",object:"backpack"})
+//     .then(data=>{
+//         console.log(data)
+//     })
 
 export const module = {
     addData,

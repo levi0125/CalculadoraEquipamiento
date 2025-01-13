@@ -1,27 +1,25 @@
+// console.log("INDeX:JS")
 import {module} from './database.js'
-// console.log(await module.readData({mode:"all"}))
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////
 /// DECLARATION OF VARIABLES
 ///////////////////////////////////////
 let selector=document.getElementById("Selector"),
     calcular=document.getElementById("calcular"),
-    materiales='Universales,Cuero,Piedra,Ebano,Hueso'.split(','),
+    materiales='Universales,Cuero,Hierro,Ebano,Hueso'.split(','),
+    englishMaterials={
+        "Universales:":"universal",
+        "Cuero:":"leather",
+        "Hierro:":"iron_stone",
+        "Ebano:":"ebony",
+        "Hueso:":"bones"},
+    currentUser=getCookieValue("current-User"),
     contenedor=document.getElementsByClassName('container')[0],
     profiles=document.getElementById("Profiles"),
     closeProfile=document.getElementById("Close-Profile"),
     addProfile=document.getElementById("Add-Profile"),
-    equipmentSelector=document.querySelector(".equiment-Selector");
+    equipmentSelector=document.querySelector(".equiment-Selector"),
+    guardarCalculo=document.getElementById("guardar-Calculo"),
+    dateSelector=document.getElementById("date");
 
 ///////////////////////////////////////
 /// END OF DECLARATION OF VARIABLES
@@ -93,8 +91,9 @@ function removeCookie(cookieName) {
 /// SETTING OF THE PAGE
 ///////////////////////////////////////
 function createGroup(MaterialName){   
-    return '<section class="Row-Flex Group-of-Material"><h3 class="name">'+MaterialName+':</h3>'+
-    '<div class="Row-Flex fillable"><input type="number" class="normal"><input type="number" class="advanced"><input type="number" class="elite"><input type="number" class="epic"><input type="number" class="legendary"></div>'
+    return '<section class="Row-Flex Group-of-Material"><h3 class="name">'+MaterialName+':</h3>'
+    +'<div class="close-Fillable"></div>' 
+    +'<div class="Row-Flex fillable"><input type="number" class="normal"><input type="number" class="advanced"><input type="number" class="elite"><input type="number" class="epic"><input type="number" class="legendary"></div>'
     +'<div class="result Row-Flex"><input type="number" class="legendary" disabled placeholder="Total Legendarios"><input type="number" class="epic" disabled placeholder="Total Epicos"><input type="number" class="elite" disabled placeholder="Total Elites"><div>'
     +'</section>'
 }
@@ -102,6 +101,21 @@ function createMaterialColumns (){
     materiales.map(e=>{
         contenedor.innerHTML+=createGroup(e)
     })
+}
+
+function refreshDateSelector(){
+    if(currentUser){
+        dateSelector.innerHTML='<option>Fecha</option>'
+        module.readData({index:"ByUser",mode:"all",key:currentUser,object:"backpack"}).then(result=>{
+            // console.log("LARGO:",result.length)
+            result?.forEach(date=>{
+                let option =document.createElement("option")
+                option.innerText+= date.date_time
+                // console.error(date)
+                dateSelector.appendChild(option)
+            })
+        })
+    }
 }
 ///////////////////////////////////////
 /// END OF SETTING OF THE PAGE
@@ -142,6 +156,13 @@ function getMaterialCount(sectionOfMaterials){
 ///////////////////////////////////////
 /// ADMINISTRATION OF USERS
 ///////////////////////////////////////
+function today(){
+    let date=new Date();
+    return [
+        date.toLocaleString().split(",",1)[0].split("/").reverse().join("-"),
+        date.toTimeString().split(" ")[0]
+    ]
+}
 async function getUsers(){
     // return JSON.parse((getCookieValue("users") || "[]"))
 
@@ -153,8 +174,10 @@ async function setCurrentUser(userName){
         alert("EL USUARIO NO EXISTE")
         return 
     }
-    createCookie("current-User",userName)
-    selector.children[0].innerText=userName
+    setCurrentUserInPage(userName,true,true)
+
+    // currentUser=userName;
+    // selector.children[0].innerText=userName
 }
 // async function changeUser(userName){
 //     if(!getUsers().includes(userName)){
@@ -196,12 +219,20 @@ async function setUsersInPage(){
     }
     profiles.style.height="0px"
 }
-function setCurrentUserInPage(user){
-    let current_User=user || getCookieValue("current-User")
-    console.log("currentUSER:",current_User)
-    if(current_User!=null){
-        selector.children[0].innerText=current_User
+function setCurrentUserInPage(user,saveUser=true,creatingCookie){
+    currentUser=user || currentUser
+    console.log("currentUSER:",currentUser)
+    if(currentUser!=null){
+        selector.children[0].innerText=currentUser
     }
+    if(creatingCookie && user){
+        createCookie("current-User",user)
+    }
+    if(saveUser!=true ){
+        console.log("BORRA EL USUAIO")
+        currentUser=null;
+    }
+    refreshDateSelector()
 }
 
 ///////////////////////////////////////
@@ -210,19 +241,28 @@ function setCurrentUserInPage(user){
 
 calcular.addEventListener("click",event=>{
     event.preventDefault();
+    if(guardarCalculo.matches(".guardado")){
+        guardarCalculo.classList.remove("guardado")
+        guardarCalculo.src="recursos/imgs/guardar.webp"
+    }
     document.querySelectorAll(".Group-of-Material").forEach(material=>{
         // console.log("mat=",material)
         getMaterialCount(material)
     })
+    guardarCalculo.style.display="block"
 })
 function giveEventChangeOfInputs(){
     let inputs=document.querySelectorAll(".fillable input");
     inputs.forEach(input=>{
-        input.addEventListener("change",e=>{
-            e.preventDefault()
-
-            console.log("DEBE CALCULAR")
-            document.getElementById("calcular").dispatchEvent(new Event("click"))      
+        // input
+        input.addEventListener("keydown",e=>{
+            // e.preventDefault()
+            // console.error(e.key)
+            if(e.key=="Enter"){
+                
+                console.log("DEBE CALCULAR")
+                document.getElementById("calcular").dispatchEvent(new Event("click"))      
+            }
         })
     })   
 }     
@@ -266,16 +306,90 @@ addProfile.addEventListener("click",async e=>{
 })
 closeProfile.addEventListener("click",e=>{
     removeCookie("current-User")
-    setCurrentUserInPage("Seleccione \nun perfil")
+    setCurrentUserInPage("Seleccione \nun perfil",false)
 })
 document.querySelectorAll(".row-equipment .slot").forEach(slot=>{
     slot.addEventListener("click",e=>{
         console.log(e.target)
     })
 })
+// console.log("GUArDAR :",guardarCalculo)
+guardarCalculo.addEventListener("click",async (e,target=e.target)=>{
+    console.log("guardar Calculo")
+    if(!target.classList.contains("guardado")){
+        //user wants to save
+        console.log("CU:",currentUser)
+        if(currentUser==null){
+            alert("DEBES SELECCIONAR UN PERFIL")
+            return 
+        }
+        let date=today()
+        let backpack={
+            "profile":currentUser,
+            "date_time":date[0]+" "+date[1]
+        };
+        document.querySelectorAll(".Group-of-Material").forEach(group=>{
+            const name= englishMaterials[ group.querySelector(".name").innerText];
+            let values=[]
+            group.querySelectorAll("input").forEach(input=>{
+                values.push(fixInput(input))
+            })
+            backpack[name]=values; 
+        })
+
+        console.log("MOCHILA:"+JSON.stringify(backpack))
+
+        const result=await module.addData(backpack,"backpack")
+        console.log(result)
+        refreshDateSelector()
+        if(result==true){
+            target.classList.add("guardado");
+            target.src="recursos/imgs/guardado.webp"
+            target.title="Guardado"
+        }else{
+            alert("HUBO UN FALLO AL GUARDAR HISTORIAL")
+        }
+        return 
+    }
+    alert("YA HAS GUARDADO")
+})
+dateSelector.addEventListener("change",e=>{
+    // console.log(e.target)
+    // console.log(e.target.value)
+    module.readData({key:e.target.value ,object:"backpack"})
+    .then(data=>{
+        console.log(data)
+        if(data==null){
+            return
+        }
+        document.querySelectorAll(".Group-of-Material").forEach(group=>{
+            const materials=data[englishMaterials[group.children[0].innerText]];
+
+            console.log(materials)
+            group.querySelectorAll("input").forEach((input,index)=>{
+                input.value=materials[index]
+            })
+        })
+    })
+})
 async function userOptionEvent(event,user=event.target){
     console.log("user ",user.innerText,"presionado")
     await setCurrentUser(user.innerText)
+}
+function setHoverInFillable(){
+    document.querySelectorAll(".close-Fillable").forEach(fillable=>{
+        fillable.addEventListener("mouseover",e=> {
+            // console.log("hover")
+            contenedor.style.setProperty("--fillable_tick","8px");
+            contenedor.style.setProperty("--fillable_color","#407f38");
+        })
+        fillable.addEventListener("mouseleave",e=> {
+            // console.log("leave")
+            contenedor.style.setProperty("--fillable_tick","5px")
+            contenedor.style.setProperty("--fillable_color","black");
+        })
+        // fillable.addEventListener("mouseleave",e=> getComputedStyle(contenedor).getPropertyValue("--fillable_tick"))
+    })
 }
 // function setEventToUserOption(){
 //     document.querySelectorAll(".user-Option").forEach(user=>{
@@ -298,13 +412,14 @@ function setEventOfSlotEquipment(){
 ///////////////////////////////////////
 /// PROCEDURES AND CALLING OF FUNCTIONS
 ///////////////////////////////////////
+refreshDateSelector()
 createMaterialColumns();
 // let close=document.getElementById("Close-Profile")
 giveEventChangeOfInputs();
+setHoverInFillable();
 setUsersInPage();
 setCurrentUserInPage();
 // setEventToUserOption();
 ///////////////////////////////////////
 /// END OF PROCEDURES AND CALLING OF FUNCTIONS
 ///////////////////////////////////////
-
